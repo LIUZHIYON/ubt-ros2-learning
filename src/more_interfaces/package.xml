@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>more_interfaces</name>
+  <version>0.0.0</version>
+  <description>Single package that defines and uses a custom interface</description>
+  <maintainer email="ubt@todo.todo">ubt</maintainer>
+  <license>Apache-2.0</license>
+
+  <!-- 构建工具：cmake -->
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <!-- 构建工具：消息生成器（把 .msg 生成 C++ 头文件） -->
+  <buildtool_depend>rosidl_default_generators</buildtool_depend>
+
+  <!-- 运行时：需要 rclcpp（C++ ROS 客户端库） -->
+  <exec_depend>rclcpp</exec_depend>
+
+  <!-- 运行时：消息的运行时支持 -->
+  <exec_depend>rosidl_default_runtime</exec_depend>
+
+  <!-- 标记为接口包（让 ROS 知道这个包提供 .msg 文件） -->
+  <member_of_group>rosidl_interface_packages</member_of_group>
+
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>
