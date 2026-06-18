@@ -65,18 +65,14 @@ colcon build --packages-select <package_name>
 ## 快速体验
 
 ```bash
-# 经典乌龟追乌龟 demo（C++ 版）
-# 终端 1
+# 🐢 经典乌龟追乌龟 demo（仅需 3 个终端）
+# 终端 1：启动 turtlesim
 ros2 run turtlesim turtlesim_node
-# 终端 2
+# 终端 2：键盘控制乌龟
 ros2 run turtlesim turtle_teleop_key
-# 终端 3
+# 终端 3：广播 turtle1
 ros2 run learning_tf2_cpp turtle_tf2_broadcaster --ros-args -p turtlename:=turtle1
-# 终端 4
-ros2 service call /spawn turtlesim/srv/Spawn "{x: 5.5, y: 5.5, theta: 0.0, name: 'turtle2'}"
-# 终端 5
-ros2 run learning_tf2_cpp turtle_tf2_broadcaster --ros-args -p turtlename:=turtle2
-# 终端 6
+# 终端 4：全自动 listener（spawn turtle2 + 广播 + 追踪，一键搞定）
 ros2 run learning_tf2_cpp turtle_tf2_listener --ros-args -p target_frame:=turtle1
 
 # 或者一键启动 Python 版
