@@ -1,56 +1,95 @@
 # ubt-ros2-learning
 
-ROS2 学习工作空间，基于 ROS2 Humble。
+ROS 2 学习工作空间，基于 ROS 2 Humble。
 
 ## 环境
 
-- **ROS2 版本：** Humble
+- **ROS 2 版本：** Humble
 - **构建工具：** colcon
 - **语言：** C++ / Python
 
 ## 包列表
 
-| 包名 | 类型 | 说明 |
-|------|------|------|
-| `cpp_pubsub` | C++ | 发布者/订阅者基础示例 |
-| `py_pubsub` | Python | 发布者/订阅者基础示例 |
-| `py_srvcli` | Python | 服务/客户端示例 |
-| `cpp_parameter_event_handler` | C++ | 参数事件处理 |
-| `python_parameters` | Python | Python 参数使用示例 |
-| `tutorial_interfaces` | C++ | 自定义消息/服务接口（Num, Sphere, AddThreeInts） |
-| `more_interfaces` | C++ | 更多自定义接口（AddressBook） |
-| `action_tutorials_interfaces` | C++ | 自定义 Action 接口（Fibonacci） |
-| `action_tutorials_py` | Python | Action 客户端/服务端示例 |
-| `node_interfaces_tutorial` | C++ | 节点接口示例 |
-| `composition_demo` | C++ | 组件组合演示 |
-| `launch_tutorial` | Python | Launch 文件教程 |
-| `learning_tf2_py` | Python | TF2 坐标变换学习 |
-| `my_package` | Python | 自定义节点模板 |
-| `ros_tutorials` | submodule | ROS 官方教程 |
+### 🟦 C++ 包
 
-## 使用
+| 包名 | 说明 |
+|---|---|
+| [`cpp_pubsub`](src/cpp_pubsub/README.md) | 发布者/订阅者基础示例（自定义 Num 消息） |
+| [`py_srvcli`](src/py_srvcli/README.md) | 服务/客户端示例（自定义 AddThreeInts） |
+| [`cpp_parameter_event_handler`](src/cpp_parameter_event_handler/README.md) | 参数变化事件处理 |
+| [`composition_demo`](src/composition_demo/README.md) | 组件组合演示（talker + listener 组件） |
+| [`node_interfaces_tutorial`](src/node_interfaces_tutorial/README.md) | 节点接口模板类使用 |
+| [`learning_tf2_cpp`](src/learning_tf2_cpp/README.md) | TF2 坐标变换教程（广播器 + 监听器） |
+
+### 🟨 Python 包
+
+| 包名 | 说明 |
+|---|---|
+| [`py_pubsub`](src/py_pubsub/README.md) | 发布者/订阅者基础示例 |
+| [`py_srvcli`](src/py_srvcli/README.md) | 服务/客户端示例 |
+| [`python_parameters`](src/python_parameters/README.md) | 参数使用示例 |
+| [`action_tutorials_py`](src/action_tutorials_py/README.md) | Action 客户端/服务端（Fibonacci） |
+| [`learning_tf2_py`](src/learning_tf2_py/README.md) | TF2 坐标变换教程 Python 版 |
+| [`launch_tutorial`](src/launch_tutorial/README.md) | Launch 文件教程 |
+| [`my_package`](src/my_package/README.md) | 自定义节点模板 |
+
+### 🟩 接口包
+
+| 包名 | 说明 |
+|---|---|
+| [`tutorial_interfaces`](src/tutorial_interfaces/README.md) | 自定义消息/服务（Num, Sphere, AddThreeInts） |
+| [`more_interfaces`](src/more_interfaces/README.md) | 更多自定义接口（AddressBook 消息） |
+| [`action_tutorials_interfaces`](src/action_tutorials_interfaces/README.md) | 自定义 Action 接口（Fibonacci） |
+
+### 📦 外部/submodule
+
+| 包名 | 说明 |
+|---|---|
+| `ros_tutorials` | ROS 官方教程（turtlesim 等） |
+
+## 构建
 
 ```bash
-# 构建
 cd ~/ros2_ws
+source /opt/ros/humble/setup.bash
 colcon build
-
-# 设置环境
 source install/setup.bash
+```
 
-# 运行示例（以 cpp_pubsub 为例）
-ros2 run cpp_pubsub talker
-ros2 run cpp_pubsub listener
+### 单独构建某个包
+
+```bash
+colcon build --packages-select <package_name>
+```
+
+## 快速体验
+
+```bash
+# 经典乌龟追乌龟 demo（C++ 版）
+# 终端 1
+ros2 run turtlesim turtlesim_node
+# 终端 2
+ros2 run turtlesim turtle_teleop_key
+# 终端 3
+ros2 run learning_tf2_cpp turtle_tf2_broadcaster --ros-args -p turtlename:=turtle1
+# 终端 4
+ros2 service call /spawn turtlesim/srv/Spawn "{x: 5.5, y: 5.5, theta: 0.0, name: 'turtle2'}"
+# 终端 5
+ros2 run learning_tf2_cpp turtle_tf2_broadcaster --ros-args -p turtlename:=turtle2
+# 终端 6
+ros2 run learning_tf2_cpp turtle_tf2_listener --ros-args -p target_frame:=turtle1
+
+# 或者一键启动 Python 版
+ros2 launch learning_tf2_py turtle_tf2_demo_launch.py
 ```
 
 ## 目录结构
 
 ```
 ros2_ws/
-├── src/          # 源代码
-├── build/        # 构建产物（已 gitignore）
-├── install/      # 安装目录（已 gitignore）
-├── log/          # 日志（已 gitignore）
-├── launch/       # 顶层 launch 文件
+├── src/              # 源代码（每个包一个目录）
+├── build/            # 构建产物（已 gitignore）
+├── install/          # 安装目录（已 gitignore）
+├── log/              # 日志（已 gitignore）
 └── README.md
 ```
