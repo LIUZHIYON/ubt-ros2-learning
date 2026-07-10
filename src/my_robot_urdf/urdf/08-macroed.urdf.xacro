@@ -1,0 +1,233 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="macroed">
+
+  <!-- ================================================================== -->
+  <!--  Xacro 常量 —— 改一个地方，所有引用都会自动更新                          -->
+  <!-- ================================================================== -->
+  <xacro:property name="width" value="0.2"/>      <!-- 身体半径 -->
+  <xacro:property name="bodylen" value="0.6"/>     <!-- 身体长度 -->
+  <xacro:property name="leglen" value="0.6"/>      <!-- 腿长 -->
+  <xacro:property name="wheel_radius" value="0.2"/> <!-- 轮子半径 -->
+  <xacro:property name="wheel_width" value="0.1"/> <!-- 轮子宽度 -->
+  <xacro:property name="pole_length" value="0.2"/> <!-- 天线长度 -->
+  <xacro:property name="pole_radius" value="0.01"/> <!-- 天线半径 -->
+  <xacro:property name="head_radius" value="0.2"/> <!-- 头部半径 -->
+  <xacro:property name="gripper_size" value="0.04"/> <!-- 夹爪尺寸 -->
+
+  <!-- ================================================================== -->
+  <!--  Xacro 宏 —— 默认惯量（给每个 link 一个安全的默认惯量）                   -->
+  <!-- ================================================================== -->
+  <xacro:macro name="default_inertial" params="mass">
+    <inertial>
+      <mass value="${mass}"/>
+      <inertia ixx="0.001" ixy="0.0" ixz="0.0"
+                        iyy="0.001" iyz="0.0"
+                               izz="0.001"/>
+    </inertial>
+  </xacro:macro>
+
+  <!-- ================================================================== -->
+  <!--  Xacro 宏 —— 腿（用 reflect 参数实现镜像：1=右腿, -1=左腿）             -->
+  <!-- ================================================================== -->
+  <xacro:macro name="leg" params="prefix reflect">
+    <link name="${prefix}_leg">
+      <visual>
+        <geometry>
+          <box size="${leglen} 0.1 0.2"/>
+        </geometry>
+        <origin xyz="0 0 -${leglen/2}" rpy="0 ${pi/2} 0"/>
+        <material name="white"/>
+      </visual>
+      <collision>
+        <geometry>
+          <box size="${leglen} 0.1 0.2"/>
+        </geometry>
+        <origin xyz="0 0 -${leglen/2}" rpy="0 ${pi/2} 0"/>
+      </collision>
+      <xacro:default_inertial mass="1"/>
+    </link>
+
+    <joint name="base_to_${prefix}_leg" type="fixed">
+      <parent link="base_link"/>
+      <child link="${prefix}_leg"/>
+      <!-- reflect=1 → y=正 → 右腿；reflect=-1 → y=负 → 左腿 -->
+      <origin xyz="0 ${reflect*(width+0.02)} 0.25"/>
+    </joint>
+  </xacro:macro>
+
+  <!-- ================================================================== -->
+  <!--  Xacro 宏 —— 轮子（同样用 reflect 做镜像）                             -->
+  <!-- ================================================================== -->
+  <xacro:macro name="wheel" params="prefix reflect">
+    <link name="${prefix}_wheel">
+      <visual>
+        <origin rpy="${pi/2} 0 0" xyz="0 0 0"/>
+        <geometry>
+          <cylinder length="${wheel_width}" radius="${wheel_radius}"/>
+        </geometry>
+        <material name="black"/>
+      </visual>
+      <collision>
+        <origin rpy="${pi/2} 0 0" xyz="0 0 0"/>
+        <geometry>
+          <cylinder length="${wheel_width}" radius="${wheel_radius}"/>
+        </geometry>
+      </collision>
+      <xacro:default_inertial mass="0.5"/>
+    </link>
+
+    <joint name="${prefix}_wheel_joint" type="continuous">
+      <parent link="base_link"/>
+      <child link="${prefix}_wheel"/>
+      <axis xyz="0 0 1"/>
+      <origin rpy="0 0 0" xyz="0 ${reflect*(width+0.02)} -0.05"/>
+      <dynamics damping="0.1" friction="1.0"/>
+    </joint>
+  </xacro:macro>
+
+  <!-- ================================================================== -->
+  <!--  Xacro 宏 —— 夹爪                                                    -->
+  <!-- ================================================================== -->
+  <xacro:macro name="gripper" params="prefix reflect">
+    <link name="${prefix}_gripper">
+      <visual>
+        <origin rpy="0 ${pi/2} 0" xyz="0.08 0 0"/>
+        <geometry>
+          <box size="${gripper_size} 0.005 ${gripper_size}"/>
+        </geometry>
+        <material name="black"/>
+      </visual>
+      <collision>
+        <origin rpy="0 ${pi/2} 0" xyz="0.08 0 0"/>
+        <geometry>
+          <box size="${gripper_size} 0.005 ${gripper_size}"/>
+        </geometry>
+      </collision>
+      <xacro:default_inertial mass="0.05"/>
+    </link>
+
+    <joint name="${prefix}_gripper_joint" type="revolute">
+      <axis xyz="0 0 1"/>
+      <!-- 左爪 0→0.548，右爪 -0.548→0 -->
+      <xacro:if value="${reflect == 1}">
+        <limit effort="1000.0" lower="-0.548" upper="0" velocity="0.5"/>
+      </xacro:if>
+      <xacro:if value="${reflect == -1}">
+        <limit effort="1000.0" lower="0.0" upper="0.548" velocity="0.5"/>
+      </xacro:if>
+      <origin rpy="0 0 0" xyz="0.2 ${reflect*0.01} 0"/>
+      <parent link="gripper_pole"/>
+      <child link="${prefix}_gripper"/>
+      <dynamics damping="0.0" friction="0.0"/>
+    </joint>
+  </xacro:macro>
+
+  <!-- ================================================================== -->
+  <!--  颜色定义（不变）                                                      -->
+  <!-- ================================================================== -->
+  <material name="blue">
+    <color rgba="0 0 0.8 1"/>
+  </material>
+  <material name="black">
+    <color rgba="0 0 0 1"/>
+  </material>
+  <material name="white">
+    <color rgba="1 1 1 1"/>
+  </material>
+  <material name="red">
+    <color rgba="0.8 0 0 1"/>
+  </material>
+
+  <!-- ================================================================== -->
+  <!--  LINKS（部件）                                                       -->
+  <!-- ================================================================== -->
+
+  <!-- 身体：蓝色圆柱体，参数从常量读取 -->
+  <link name="base_link">
+    <visual>
+      <geometry>
+        <cylinder radius="${width}" length="${bodylen}"/>
+      </geometry>
+      <material name="blue"/>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder radius="${width}" length="${bodylen}"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="10"/>
+      <!-- 圆柱体惯量公式：i=(1/12)*m*(3r²+h²) -->
+      <inertia ixx="${10/12*(3*width*width+bodylen*bodylen)}" ixy="0.0" ixz="0.0"
+                                iyy="${10/12*(3*width*width+bodylen*bodylen)}" iyz="0.0"
+                                                       izz="${10/2*width*width}"/>
+    </inertial>
+  </link>
+
+  <!-- 头部：白色球体 -->
+  <link name="head">
+    <visual>
+      <geometry>
+        <sphere radius="${head_radius}"/>
+      </geometry>
+      <material name="white"/>
+    </visual>
+    <collision>
+      <geometry>
+        <sphere radius="${head_radius}"/>
+      </geometry>
+    </collision>
+    <xacro:default_inertial mass="2"/>
+  </link>
+
+  <!-- 夹爪伸缩杆：红色细柱 -->
+  <link name="gripper_pole">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <cylinder length="${pole_length}" radius="${pole_radius}"/>
+      </geometry>
+      <material name="red"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <cylinder length="${pole_length}" radius="${pole_radius}"/>
+      </geometry>
+    </collision>
+    <xacro:default_inertial mass="0.1"/>
+  </link>
+
+  <!-- ================================================================== -->
+  <!--  用宏批量生成对称部件！（一行搞定左右）                                   -->
+  <!-- ================================================================== -->
+  <xacro:leg prefix="right" reflect="1"/>
+  <xacro:leg prefix="left" reflect="-1"/>
+
+  <xacro:wheel prefix="right" reflect="1"/>
+  <xacro:wheel prefix="left" reflect="-1"/>
+
+  <xacro:gripper prefix="right" reflect="1"/>
+  <xacro:gripper prefix="left" reflect="-1"/>
+
+  <!-- ================================================================== -->
+  <!--  JOINTS（关节）—— 不可对称的单独写                                      -->
+  <!-- ================================================================== -->
+
+  <joint name="head_swivel" type="continuous">
+    <parent link="base_link"/>
+    <child link="head"/>
+    <axis xyz="0 0 1"/>
+    <origin xyz="0 0 ${bodylen/2}"/>   <!-- 身体长度的一半 = 0.3 -->
+    <dynamics damping="0.0" friction="0.0"/>
+  </joint>
+
+  <joint name="gripper_extension" type="prismatic">
+    <parent link="base_link"/>
+    <child link="gripper_pole"/>
+    <limit effort="1000.0" lower="-${bodylen*0.63}" upper="0" velocity="0.5"/>
+    <origin rpy="0 0 0" xyz="${width-0.01} 0 ${bodylen/3}"/>
+    <dynamics damping="0.0" friction="0.0"/>
+  </joint>
+
+</robot>

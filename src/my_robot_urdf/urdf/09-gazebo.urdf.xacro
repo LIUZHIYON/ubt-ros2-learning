@@ -1,0 +1,181 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="r2d2_gazebo">
+
+  <!-- ================================================================== -->
+  <!--  常量                                                                -->
+  <!-- ================================================================== -->
+  <xacro:property name="width" value="0.2"/>
+  <xacro:property name="bodylen" value="0.6"/>
+  <xacro:property name="leglen" value="0.6"/>
+  <xacro:property name="wheel_radius" value="0.2"/>
+  <xacro:property name="wheel_width" value="0.1"/>
+  <xacro:property name="pole_length" value="0.2"/>
+  <xacro:property name="pole_radius" value="0.01"/>
+  <xacro:property name="head_radius" value="0.2"/>
+  <xacro:property name="gripper_size" value="0.04"/>
+
+  <!-- ================================================================== -->
+  <!--  宏                                                                  -->
+  <!-- ================================================================== -->
+  <xacro:macro name="default_inertial" params="mass">
+    <inertial>
+      <mass value="${mass}"/>
+      <inertia ixx="0.001" ixy="0.0" ixz="0.0"
+                        iyy="0.001" iyz="0.0"
+                               izz="0.001"/>
+    </inertial>
+  </xacro:macro>
+
+  <xacro:macro name="leg" params="prefix reflect">
+    <link name="${prefix}_leg">
+      <visual>
+        <geometry><box size="${leglen} 0.1 0.2"/></geometry>
+        <origin xyz="0 0 -${leglen/2}" rpy="0 ${pi/2} 0"/>
+        <material name="white"/>
+      </visual>
+      <collision>
+        <geometry><box size="${leglen} 0.1 0.2"/></geometry>
+        <origin xyz="0 0 -${leglen/2}" rpy="0 ${pi/2} 0"/>
+      </collision>
+      <xacro:default_inertial mass="1"/>
+    </link>
+    <joint name="base_to_${prefix}_leg" type="fixed">
+      <parent link="base_link"/>
+      <child link="${prefix}_leg"/>
+      <origin xyz="0 ${reflect*(width+0.02)} 0.25"/>
+    </joint>
+  </xacro:macro>
+
+  <xacro:macro name="wheel" params="prefix reflect">
+    <link name="${prefix}_wheel">
+      <visual>
+        <origin rpy="${pi/2} 0 0" xyz="0 0 0"/>
+        <geometry><cylinder length="${wheel_width}" radius="${wheel_radius}"/></geometry>
+        <material name="black"/>
+      </visual>
+      <collision>
+        <origin rpy="${pi/2} 0 0" xyz="0 0 0"/>
+        <geometry><cylinder length="${wheel_width}" radius="${wheel_radius}"/></geometry>
+      </collision>
+      <xacro:default_inertial mass="0.5"/>
+    </link>
+    <joint name="${prefix}_wheel_joint" type="continuous">
+      <parent link="base_link"/>
+      <child link="${prefix}_wheel"/>
+      <axis xyz="0 0 1"/>
+      <origin rpy="0 0 0" xyz="0 ${reflect*(width+0.02)} -0.05"/>
+    </joint>
+  </xacro:macro>
+
+  <!-- ================================================================== -->
+  <!--  颜色                                                                 -->
+  <!-- ================================================================== -->
+  <!-- 注意：Gazebo 用 Gazebo 自己的材质系统，这里保留 URDF 颜色给 RViz 用 -->
+  <material name="blue"><color rgba="0 0 0.8 1"/></material>
+  <material name="black"><color rgba="0 0 0 1"/></material>
+  <material name="white"><color rgba="1 1 1 1"/></material>
+  <material name="red"><color rgba="0.8 0 0 1"/></material>
+
+  <!-- ================================================================== -->
+  <!--  LINKS                                                              -->
+  <!-- ================================================================== -->
+
+  <!-- 身体 -->
+  <link name="base_link">
+    <visual>
+      <geometry><cylinder radius="${width}" length="${bodylen}"/></geometry>
+      <material name="blue"/>
+    </visual>
+    <collision>
+      <geometry><cylinder radius="${width}" length="${bodylen}"/></geometry>
+    </collision>
+    <inertial>
+      <mass value="10"/>
+      <inertia ixx="${10/12*(3*width*width+bodylen*bodylen)}" ixy="0.0" ixz="0.0"
+                                iyy="${10/12*(3*width*width+bodylen*bodylen)}" iyz="0.0"
+                                                       izz="${10/2*width*width}"/>
+    </inertial>
+  </link>
+
+  <!-- 头部 -->
+  <link name="head">
+    <visual>
+      <geometry><sphere radius="${head_radius}"/></geometry>
+      <material name="white"/>
+    </visual>
+    <collision>
+      <geometry><sphere radius="${head_radius}"/></geometry>
+    </collision>
+    <xacro:default_inertial mass="2"/>
+  </link>
+
+  <!-- 天线 -->
+  <link name="gripper_pole">
+    <visual>
+      <geometry><cylinder length="${pole_length}" radius="${pole_radius}"/></geometry>
+      <material name="red"/>
+    </visual>
+    <collision>
+      <geometry><cylinder length="${pole_length}" radius="${pole_radius}"/></geometry>
+    </collision>
+    <xacro:default_inertial mass="0.1"/>
+  </link>
+
+  <!-- 左右对称部件（宏批量生成） -->
+  <xacro:leg prefix="right" reflect="1"/>
+  <xacro:leg prefix="left" reflect="-1"/>
+  <xacro:wheel prefix="right" reflect="1"/>
+  <xacro:wheel prefix="left" reflect="-1"/>
+
+  <!-- ================================================================== -->
+  <!--  JOINTS（可动关节）                                                   -->
+  <!-- ================================================================== -->
+
+  <!-- 头部旋转 -->
+  <joint name="head_swivel" type="continuous">
+    <parent link="base_link"/>
+    <child link="head"/>
+    <axis xyz="0 0 1"/>
+    <origin xyz="0 0 ${bodylen/2}"/>
+  </joint>
+
+  <!-- 天线伸缩 -->
+  <joint name="gripper_extension" type="prismatic">
+    <parent link="base_link"/>
+    <child link="gripper_pole"/>
+    <limit effort="1000.0" lower="-0.38" upper="0" velocity="0.5"/>
+    <origin rpy="0 0 0" xyz="0.19 0 ${bodylen/3}"/>
+  </joint>
+
+  <!-- ================================================================== -->
+  <!--  Gazebo 插件                                                         -->
+  <!--  这是教程的核心：让 ROS 和 Gazebo 之间能通信                            -->
+  <!-- ================================================================== -->
+
+  <!--
+    Gazebo ROS Control 插件：
+    - 把 Gazebo 仿真里的关节状态发布到 ROS /joint_states
+    - 接收 ROS 发来的控制指令驱动 Gazebo 里的关节
+  -->
+  <gazebo>
+    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+      <robotNamespace>/</robotNamespace>
+    </plugin>
+  </gazebo>
+
+  <!--
+    关节状态发布器：
+    让所有非 fixed 的关节（continuous, prismatic）自动发布 /joint_states
+  -->
+  <gazebo>
+    <plugin name="joint_state_publisher" filename="libgazebo_ros_joint_state_publisher.so">
+      <robotNamespace>/</robotNamespace>
+      <updateRate>50</updateRate>
+      <jointName>head_swivel</jointName>
+      <jointName>gripper_extension</jointName>
+      <jointName>right_wheel_joint</jointName>
+      <jointName>left_wheel_joint</jointName>
+    </plugin>
+  </gazebo>
+
+</robot>

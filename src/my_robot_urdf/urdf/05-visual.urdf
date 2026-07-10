@@ -1,0 +1,139 @@
+<?xml version="1.0"?>
+<robot name="visual">
+
+  <!-- 颜色定义 -->
+  <material name="blue">
+    <color rgba="0 0 0.8 1"/>
+  </material>
+  <material name="black">
+    <color rgba="0 0 0 1"/>
+  </material>
+  <material name="white">
+    <color rgba="1 1 1 1"/>
+  </material>
+  <material name="red">
+    <color rgba="0.8 0 0 1"/>
+  </material>
+
+  <!-- ============ LINKS（部件）============ -->
+
+  <!-- 身体：蓝色圆柱体 -->
+  <link name="base_link">
+    <visual>
+      <geometry>
+        <cylinder length="0.6" radius="0.2"/>
+      </geometry>
+      <material name="blue"/>
+    </visual>
+  </link>
+
+  <!-- 左腿：白色长方体 -->
+  <link name="left_leg">
+    <visual>
+      <geometry>
+        <box size="0.6 0.1 0.2"/>
+      </geometry>
+      <origin rpy="0 1.57075 0" xyz="0 0 0"/>
+      <material name="white"/>
+    </visual>
+  </link>
+
+  <!-- 右腿：白色长方体 -->
+  <link name="right_leg">
+    <visual>
+      <geometry>
+        <box size="0.6 0.1 0.2"/>
+      </geometry>
+      <origin rpy="0 1.57075 0" xyz="0 0 0"/>
+      <material name="white"/>
+    </visual>
+  </link>
+
+  <!-- 头部：白色球体 -->
+  <link name="head">
+    <visual>
+      <geometry>
+        <sphere radius="0.2"/>
+      </geometry>
+      <material name="white"/>
+    </visual>
+  </link>
+
+  <!-- 左轮：黑色圆柱体 -->
+  <link name="left_wheel">
+    <visual>
+      <origin rpy="1.57075 0 0" xyz="0 0 0"/>
+      <geometry>
+        <cylinder length="0.1" radius="0.2"/>
+      </geometry>
+      <material name="black"/>
+    </visual>
+  </link>
+
+  <!-- 右轮：黑色圆柱体 -->
+  <link name="right_wheel">
+    <visual>
+      <origin rpy="1.57075 0 0" xyz="0 0 0"/>
+      <geometry>
+        <cylinder length="0.1" radius="0.2"/>
+      </geometry>
+      <material name="black"/>
+    </visual>
+  </link>
+
+  <!-- 天线/传感器：红色细柱 -->
+  <link name="gripper_pole">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <cylinder length="0.2" radius="0.01"/>
+      </geometry>
+      <material name="red"/>
+    </visual>
+  </link>
+
+  <!-- ============ JOINTS（关节/连接）============ -->
+
+  <!-- 身体 → 左腿 -->
+  <joint name="base_to_left_leg" type="fixed">
+    <parent link="base_link"/>
+    <child link="left_leg"/>
+    <origin xyz="0 0.22 0.25"/>
+  </joint>
+
+  <!-- 身体 → 右腿 -->
+  <joint name="base_to_right_leg" type="fixed">
+    <parent link="base_link"/>
+    <child link="right_leg"/>
+    <origin xyz="0 -0.22 0.25"/>
+  </joint>
+
+  <!-- 身体 → 左轮 -->
+  <joint name="base_to_left_wheel" type="fixed">
+    <parent link="base_link"/>
+    <child link="left_wheel"/>
+    <origin rpy="0 0 0" xyz="0 0.22 -0.05"/>
+  </joint>
+
+  <!-- 身体 → 右轮 -->
+  <joint name="base_to_right_wheel" type="fixed">
+    <parent link="base_link"/>
+    <child link="right_wheel"/>
+    <origin rpy="0 0 0" xyz="0 -0.22 -0.05"/>
+  </joint>
+
+  <!-- 身体 → 头部 -->
+  <joint name="base_to_head" type="fixed">
+    <parent link="base_link"/>
+    <child link="head"/>
+    <origin xyz="0 0 0.3"/>
+  </joint>
+
+  <!-- 头部 → 天线 -->
+  <joint name="head_to_pole" type="fixed">
+    <parent link="head"/>
+    <child link="gripper_pole"/>
+    <origin xyz="0 0 0.2"/>
+  </joint>
+
+</robot>

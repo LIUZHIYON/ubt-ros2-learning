@@ -1,0 +1,83 @@
+<?xml version="1.0"?>
+<robot name="r2d2">
+
+  <!-- ================================================================ -->
+  <!--  axis：机器人的"底座"坐标系                                        -->
+  <!--  C++ 节点发布 odom→axis 的 TF 变换                                 -->
+  <!--  robot_state_publisher 从这里开始往 base_link 往下推                -->
+  <!-- ================================================================ -->
+  <link name="axis"/>
+
+  <!-- 身体（蓝色圆柱体） -->
+  <link name="base_link">
+    <visual>
+      <geometry><cylinder length="0.6" radius="0.2"/></geometry>
+      <material name="blue">
+        <color rgba="0 0 0.8 1"/>
+      </material>
+    </visual>
+  </link>
+
+  <!-- 头部（白色球体） -->
+  <link name="head">
+    <visual>
+      <geometry><sphere radius="0.2"/></geometry>
+      <material name="white">
+        <color rgba="1 1 1 1"/>
+      </material>
+    </visual>
+  </link>
+
+  <!-- 左腿（白色盒子） -->
+  <link name="left_leg">
+    <visual>
+      <geometry><box size="0.6 0.1 0.2"/></geometry>
+      <origin rpy="0 1.57075 0" xyz="0 0 0"/>
+      <material name="white">
+        <color rgba="1 1 1 1"/>
+      </material>
+    </visual>
+  </link>
+
+  <!-- 右腿（白色盒子） -->
+  <link name="right_leg">
+    <visual>
+      <geometry><box size="0.6 0.1 0.2"/></geometry>
+      <origin rpy="0 1.57075 0" xyz="0 0 0"/>
+      <material name="white">
+        <color rgba="1 1 1 1"/>
+      </material>
+    </visual>
+  </link>
+
+  <!-- ===== 关节 ===== -->
+
+  <!-- ★ 关键！axis → base_link（固定关节，把底座和身体连起来） -->
+  <joint name="axis_to_base_link" type="fixed">
+    <parent link="axis"/>
+    <child link="base_link"/>
+  </joint>
+
+  <!-- 头部旋转（continuous：可无限旋转） -->
+  <joint name="head_swivel" type="continuous">
+    <parent link="base_link"/>
+    <child link="head"/>
+    <axis xyz="0 0 1"/>
+    <origin xyz="0 0 0.3"/>
+  </joint>
+
+  <!-- 右腿（fixed：固定） -->
+  <joint name="base_to_right_leg" type="fixed">
+    <parent link="base_link"/>
+    <child link="right_leg"/>
+    <origin xyz="0 -0.22 0.25"/>
+  </joint>
+
+  <!-- 左腿（fixed：固定） -->
+  <joint name="base_to_left_leg" type="fixed">
+    <parent link="base_link"/>
+    <child link="left_leg"/>
+    <origin xyz="0 0.22 0.25"/>
+  </joint>
+
+</robot>

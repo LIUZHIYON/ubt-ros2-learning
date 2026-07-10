@@ -1,0 +1,85 @@
+<?xml version="1.0"?>
+<robot name="my_robot">
+
+  <!-- ============================================ -->
+  <!-- 底座：蓝色盒子                                -->
+  <!-- ============================================ -->
+  <link name="base_link">
+    <visual>
+      <geometry>
+        <box size="0.3 0.3 0.1"/>
+      </geometry>
+      <origin xyz="0 0 0.05" rpy="0 0 0"/>
+      <material name="blue">
+        <color rgba="0 0 1 1"/>
+      </material>
+    </visual>
+  </link>
+
+  <!-- ============================================ -->
+  <!-- 第一段手臂：红色圆柱体                        -->
+  <!-- ============================================ -->
+  <link name="link_1">
+    <visual>
+      <geometry>
+        <cylinder length="0.5" radius="0.05"/>
+      </geometry>
+      <origin xyz="0 0 0.25" rpy="0 0 0"/>
+      <material name="red">
+        <color rgba="1 0 0 1"/>
+      </material>
+    </visual>
+  </link>
+
+  <!-- base_link → link_1 旋转关节（无限旋转） -->
+  <joint name="joint_1" type="continuous">
+    <parent link="base_link"/>
+    <child link="link_1"/>
+    <origin xyz="0 0 0.1" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+
+  <!-- ============================================ -->
+  <!-- 第二段手臂：绿色圆柱体                        -->
+  <!-- ============================================ -->
+  <link name="link_2">
+    <visual>
+      <geometry>
+        <cylinder length="0.5" radius="0.05"/>
+      </geometry>
+      <origin xyz="0 0 0.25" rpy="0 0 0"/>
+      <material name="green">
+        <color rgba="0 1 0 1"/>
+      </material>
+    </visual>
+  </link>
+
+  <!-- link_1 → link_2 旋转关节（无限旋转） -->
+  <joint name="joint_2" type="continuous">
+    <parent link="link_1"/>
+    <child link="link_2"/>
+    <origin xyz="0 0 0.5" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+
+  <!-- ============================================ -->
+  <!-- 相机：黑色小方块，固定在 link_2 上           -->
+  <!-- ============================================ -->
+  <link name="camera_link">
+    <visual>
+      <geometry>
+        <box size="0.05 0.05 0.05"/>
+      </geometry>
+      <material name="black">
+        <color rgba="0 0 0 1"/>
+      </material>
+    </visual>
+  </link>
+
+  <joint name="camera_joint" type="fixed">
+    <parent link="link_2"/>
+    <child link="camera_link"/>
+    <origin xyz="0.05 0 0.55" rpy="0 0 0"/>
+  </joint>
+
+</robot>
