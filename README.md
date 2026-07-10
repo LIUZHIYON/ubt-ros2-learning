@@ -41,6 +41,14 @@ ROS 2 学习工作空间，基于 ROS 2 Humble。
 | [`more_interfaces`](src/more_interfaces/README.md) | 更多自定义接口（AddressBook 消息） |
 | [`action_tutorials_interfaces`](src/action_tutorials_interfaces/README.md) | 自定义 Action 接口（Fibonacci） |
 
+### 🟪 URDF 学习
+
+| 包名 | 说明 |
+|---|---|
+| [`my_robot_urdf`](src/my_robot_urdf/README.md) | URDF 从零入门（01~09：基础形状 → 材质 → Gazebo 仿真） |
+| [`second_robot`](src/second_robot/README.md) | URDF + robot_state_publisher 教程 |
+| [`urdf_tutorial_cpp`](src/urdf_tutorial_cpp/README.md) | URDF 实操 C++ 版（发布关节状态、TF） |
+
 ### 📦 外部/submodule
 
 | 包名 | 说明 |
