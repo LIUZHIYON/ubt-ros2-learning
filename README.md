@@ -49,6 +49,17 @@ ROS 2 学习工作空间，基于 ROS 2 Humble。
 | [`second_robot`](src/second_robot/README.md) | URDF + robot_state_publisher 教程 |
 | [`urdf_tutorial_cpp`](src/urdf_tutorial_cpp/README.md) | URDF 实操 C++ 版（发布关节状态、TF） |
 
+### 🎨 RViz / 可视化
+
+| 包名 | 说明 |
+|---|---|
+| [`visualization_marker_tutorials`](src/visualization_marker_tutorials/) | Marker 基本形状：方块/球/箭头/圆柱 |
+| [`points_and_lines_tutorial`](src/points_and_lines_tutorial/) | Marker 点和线：螺旋线/点集/连续线/独立线段 |
+| [`marker_display_types_tutorial`](src/marker_display_types_tutorial/) | Marker 全类型演示：12 种 Marker 类型循环展示 |
+| [`rviz_plugin_tutorial_msgs`](src/rviz_plugin_tutorial_msgs/) | 自定义消息 Point2D（RViz 插件教程的接口包） |
+| [`rviz_plugin_tutorial`](src/rviz_plugin_tutorial/) | RViz 自定义 **Display** 插件：订阅 Point2D → 3D 渲染方块 |
+| [`rviz_panel_tutorial`](src/rviz_panel_tutorial/) | RViz 自定义 **Panel** 面板插件：订阅/发布 ROS 消息 |
+
 ### 📦 外部/submodule
 
 | 包名 | 说明 |
@@ -73,19 +84,42 @@ colcon build --packages-select <package_name>
 ## 快速体验
 
 ```bash
-# 🐢 经典乌龟追乌龟 demo（仅需 3 个终端）
+# 🐢 经典乌龟追乌龟 demo
 # 终端 1：启动 turtlesim
 ros2 run turtlesim turtlesim_node
 # 终端 2：键盘控制乌龟
 ros2 run turtlesim turtle_teleop_key
-# 终端 3：广播 turtle1
-ros2 run learning_tf2_cpp turtle_tf2_broadcaster --ros-args -p turtlename:=turtle1
-# 终端 4：全自动 listener（spawn turtle2 + 广播 + 追踪，一键搞定）
+# 终端 3：全自动 listener（spawn turtle2 + 广播 + 追踪）
 ros2 run learning_tf2_cpp turtle_tf2_listener --ros-args -p target_frame:=turtle1
-
 # 或者一键启动 Python 版
 ros2 launch learning_tf2_py turtle_tf2_demo_launch.py
 ```
+
+### 🖼️ RViz 可视化
+
+```bash
+# 终端 1：启动 RViz
+rviz2
+
+# Marker 基本形状（方块/球/箭头/圆柱）
+ros2 run visualization_marker_tutorials basic_shapes
+
+# 点和线（螺旋线）
+ros2 run points_and_lines_tutorial points_and_lines
+
+# 全 12 种 Marker 类型演示
+ros2 run marker_display_types_tutorial all_markers_demo
+
+# 自定义 Display 插件（需先在 RViz 里 Add → Point2D）
+ros2 topic pub /point rviz_plugin_tutorial_msgs/msg/Point2D \
+  "{header: {frame_id: map}, x: 1.0, y: 2.0}" -r 1
+
+# 自定义 Panel 面板（RViz 菜单 → Panels → Add New Panel → DemoPanel）
+ros2 topic pub /input std_msgs/msg/String "{data: 'Hello RViz'}"
+ros2 topic echo /output
+```
+
+> **注意：** RViz 的 Fixed Frame 需要设为代码里对应的 frame_id（如 `my_frame`、`map`）
 
 ## 目录结构
 
