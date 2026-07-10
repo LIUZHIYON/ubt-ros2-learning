@@ -1,0 +1,11 @@
+<library path="rviz_plugin_tutorial">
+  <class name="Point2D"
+         type="rviz_plugin_tutorial::PointDisplay"
+         base_class_type="rviz_common::Display">
+    <description>
+      订阅 Point2D 消息, 在 3D 视图中显示彩色方块。
+      支持自定义颜色, x&lt;0 时显示警告状态。
+    </description>
+    <message_type>rviz_plugin_tutorial_msgs/msg/Point2D</message_type>
+  </class>
+</library>
