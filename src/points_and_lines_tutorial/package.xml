@@ -1,14 +1,15 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>visualization_marker_tutorials</name>
+  <name>points_and_lines_tutorial</name>
   <version>0.0.0</version>
-  <description>Marker Basic Shapes 教程：在 RViz 中显示方块、球、箭头、圆柱等基本形状</description>
+  <description>Marker Points and Lines 教程：在 RViz 中显示点、连续线和独立线段</description>
   <maintainer email="2950317571@qq.com">刘志勇</maintainer>
   <license>BSD</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
+  <depend>geometry_msgs</depend>
   <depend>rclcpp</depend>
   <depend>visualization_msgs</depend>
 
