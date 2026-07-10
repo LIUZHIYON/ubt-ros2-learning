@@ -1,0 +1,10 @@
+<library path="rviz_panel_tutorial">
+  <class name="rviz_panel_tutorial/DemoPanel"
+         type="rviz_panel_tutorial::DemoPanel"
+         base_class_type="rviz_common::Panel">
+    <description>
+      演示面板: 订阅 /input 话题显示消息, 点击按钮发布到 /output。
+      展示如何在 RViz 面板中集成 ROS 订阅器和发布器。
+    </description>
+  </class>
+</library>
