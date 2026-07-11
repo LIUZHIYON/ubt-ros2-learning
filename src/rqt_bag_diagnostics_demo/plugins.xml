@@ -1,0 +1,9 @@
+<library path=".">
+  <class name="DiagnosticBagPlugin"
+         type="rqt_bag_diagnostics_demo.the_plugin.DiagnosticBagPlugin"
+         base_class_type="rqt_bag::Plugin">
+    <description>
+      把 DiagnosticStatus 消息按 OK/WARN/ERROR/STALE 等级画成不同颜色的色块
+    </description>
+  </class>
+</library>

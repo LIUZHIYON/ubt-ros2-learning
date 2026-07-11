@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>bag_recorder_demo</name>
+  <version>0.0.0</version>
+  <description>Demo: record rosbag from within a C++ node using rosbag2_cpp API</description>
+  <maintainer email="2950317571@qq.com">ubt</maintainer>
+  <license>Apache-2.0</license>
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <depend>rclcpp</depend>
+  <depend>std_msgs</depend>
+  <depend>rosbag2_cpp</depend>
+  <depend>rosbag2_storage</depend>
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>
