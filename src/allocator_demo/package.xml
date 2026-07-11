@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>allocator_demo</name>
+  <version>0.0.0</version>
+  <description>Custom memory allocator demo - counts heap vs custom allocator usage</description>
+  <maintainer email="2950317571@qq.com">ubt</maintainer>
+  <license>Apache-2.0</license>
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <depend>rclcpp</depend>
+  <depend>std_msgs</depend>
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

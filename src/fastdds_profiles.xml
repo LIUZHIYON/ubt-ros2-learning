@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Fast DDS XML 配置（兼容 Fast DDS 2.6.x / ROS2 Humble）
+  
+  使用方式：
+    export FASTDDS_DEFAULT_PROFILES_FILE=~/ros2_ws/src/fastdds_profiles.xml
+    ros2 run cpp_pubsub publisher
+-->
+<profiles xmlns="http://www.eprosima.com/XMLSchemas/fastRTPS_Profiles">
+
+  <!-- ================================================================
+   示例 1：UDP 传输微调（默认就是 UDP）
+   用途：调大 socket 缓冲区减少丢包、调整发现周期
+  ================================================================ -->
+  <participant profile_name="udp_tuned">
+    <rtps>
+      <sendSocketBufferSize>1048576</sendSocketBufferSize>
+      <listenSocketBufferSize>1048576</listenSocketBufferSize>
+      <builtin>
+        <discovery_config>
+          <leaseDuration>
+            <sec>30</sec>
+          </leaseDuration>
+          <leaseAnnouncement>
+            <sec>10</sec>
+          </leaseAnnouncement>
+        </discovery_config>
+      </builtin>
+    </rtps>
+  </participant>
+
+  <!-- ================================================================
+   示例 2：限制发现的参与者数量
+   用途：大型机器人系统里防止无关节点占用资源
+  ================================================================ -->
+  <participant profile_name="limited_participants">
+    <rtps>
+      <allocation>
+        <total_participants>
+          <initial>5</initial>
+          <maximum>20</maximum>
+          <increment>1</increment>
+        </total_participants>
+        <total_readers>
+          <initial>10</initial>
+          <maximum>100</maximum>
+          <increment>1</increment>
+        </total_readers>
+        <total_writers>
+          <initial>10</initial>
+          <maximum>100</maximum>
+          <increment>1</increment>
+        </total_writers>
+      </allocation>
+    </rtps>
+  </participant>
+
+  <!-- ================================================================
+   示例 3：异步发布（非阻塞发送）
+   用途：发布大量数据时不阻塞主线程
+  ================================================================ -->
+  <publisher profile_name="async_pub">
+    <qos>
+      <publishMode>
+        <kind>ASYNCHRONOUS</kind>
+      </publishMode>
+    </qos>
+    <historyMemoryPolicy>DYNAMIC</historyMemoryPolicy>
+  </publisher>
+
+  <!-- ================================================================
+   示例 4：限定消息历史深度 + 资源限制
+   用途：防止内存无限增长
+  ================================================================ -->
+  <subscriber profile_name="resource_limited_sub">
+    <topic>
+      <kind>WITH_KEY</kind>
+      <name>example_topic</name>
+      <dataType>example_type</dataType>
+    </topic>
+    <qos>
+      <durability>
+        <kind>TRANSIENT_LOCAL</kind>
+      </durability>
+    </qos>
+    <historyMemoryPolicy>PREALLOCATED</historyMemoryPolicy>
+  </subscriber>
+
+</profiles>
